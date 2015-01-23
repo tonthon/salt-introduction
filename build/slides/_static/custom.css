@@ -1,0 +1,39 @@
+/*
+ * File Name :
+ *
+ * Copyright (C) 2012 Gaston TJEBBES g.t@majerti.fr
+ * Company : Majerti ( http://www.majerti.fr )
+ *
+ * This software is distributed under GPLV3
+ * License: http://www.gnu.org/licenses/gpl-3.0.txt
+ *
+ */
+h1{
+  font-size: 1.8em;
+  margin-top: 20px;
+}
+#saltstack, #saltstack p, #saltstack h1{
+  text-align: center;
+}
+.slide-footer{
+  width: 90%;
+  right: 1em;
+  text-align:left;
+  background-image: url("logo.png");
+  background-repeat: no-repeat;
+  background-position: right top;
+}
+#merci .figure{
+  width: 30%;
+}
+#merci img{
+  margin-top:150px;
+}
+#merci .caption{
+  position: relative;
+  text-align:center;
+}
+#merci table{
+  width: 650px;
+  display: block;
+}

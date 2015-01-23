@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Saltstack &mdash; Gérer son infra avec Salt 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="_static/slides.css" type="text/css" />
+    
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    
+
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/common.js"></script>
+    <script type="text/javascript" src="_static/slides.js"></script>
+    <script type="text/javascript" src="_static/sync.js"></script>
+    <script type="text/javascript" src="_static/controller.js"></script>
+    <script type="text/javascript" src="_static/init.js"></script>
+    
+    <link rel="top" title="Gérer son infra avec Salt 1 documentation" href="#" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  <article class="slide level-1" id="saltstack">
+<h1>Saltstack</h1>
+<img alt="_images/salt.png" class="align-center" src="_images/salt.png" />
+<p>Gaston TJEBBES</p>
+<p><a class="reference external" href="mailto:tech&#37;&#52;&#48;majerti&#46;fr">tech<span>&#64;</span>majerti<span>&#46;</span>fr</a></p>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="le-contexte">
+<h1>Le contexte</h1>
+<ul class="simple">
+<li>L'hébergement de solutions développées en interne</li>
+<li>Le réseau interne d'une entreprise</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="le-besoin">
+<h1>Le besoin</h1>
+<ul class="simple">
+<li>Gain de temps</li>
+<li>Gestion des problématiques de sécurité</li>
+<li>Automatisation du workflow</li>
+<li>Uniformiser les configurations</li>
+<li>Anticiper la croissance</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="autrement-dit">
+<h1>Autrement dit</h1>
+<ul class="simple">
+<li>Lancer des commandes de manière unifiée</li>
+<li>Centraliser des configurations éparses</li>
+<li>Gérer des dépendances (logiciels, fonctionnels)</li>
+<li>Cibler des machines</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="pourquoi-saltstack">
+<h1>Pourquoi Saltstack</h1>
+<ul class="simple">
+<li>Libre</li>
+<li>Python</li>
+<li>Une architecture simple</li>
+<li>Un système de ciblage avancé (grains + pillar)</li>
+<li>Des fonctionnalités qui matchent nos besoins et nos ambitions
+(salt-virt, reactor, salt-mine ...)</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="le-projet">
+<h1>Le projet</h1>
+<ul class="simple">
+<li>Projet initié en 2011 par Thomas S Hatch</li>
+<li>Licence Apache 2.0</li>
+<li>Une ML très active</li>
+<li>Près d'un millier de contributeurs</li>
+<li>Porté par une entreprise du même nom</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="les-composants">
+<h1>Les composants</h1>
+<ul class="simple">
+<li>Protocole : ZeroMQ ou RAET</li>
+<li>Format : MsgPack + AES</li>
+<li>Authentification : clés RSA</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="disponibilite">
+<h1>Disponibilité</h1>
+<ul class="simple">
+<li>BSD</li>
+<li>Linux</li>
+<li>Windows</li>
+<li>Osx</li>
+<li>...</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="architecture">
+<h1>Architecture</h1>
+<p>Trois niveaux de complexité:</p>
+<ul class="simple">
+<li>Appel local par le biais de salt-call</li>
+<li>Un master et des minions</li>
+<li>salt-syndic, l'architecture à plusieurs étages</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="un-master-des-minions">
+<h1>Un master des minions</h1>
+<img src="_images/1floor.svg" />
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="salt-syndic">
+<h1>Salt-syndic</h1>
+<img src="_images/saltsyndic.svg" />
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="commencer">
+<h1>Commencer</h1>
+<p>Installer un &quot;master&quot;</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">yum install salt-master</span>
+</pre></div>
+</div>
+<p>Installer des &quot;minion&quot;</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">yum install salt-minion</span>
+</pre></div>
+</div>
+<p>Référencer</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">salt-key -a minion.example.com</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="on-peut-desormais-jouer">
+<h1>On peut désormais jouer</h1>
+<p>Les <strong>modules</strong> fournissent un panel de commandes exécutables</p>
+<div class="highlight-bash"><div class="highlight"><pre>salt <span class="s1">&#39;*&#39;</span> test.ping
+salt <span class="s1">&#39;minion.example.com&#39;</span> pkg.upgrade
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="modules">
+<h1>Modules</h1>
+<ul class="simple">
+<li>De nombreuses librairies (mount, pkg, rabbitmq, ...)</li>
+<li>Des modules &quot;méta&quot; ( ex: pkg )</li>
+<li>Développables facilement</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#/srv/salt/_modules/hello.py</span>
+<span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_buffer</span><span class="p">:</span>
+        <span class="n">file_buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">salt &#39;minion.example.com&#39; hello.message /tmp/test &quot;Hello world&quot;</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="bien-viser-le-role-des-grains-1">
+<h1>Bien viser, le rôle des grains (1)</h1>
+<p>Les minions fournissent par défaut des variables d'environnement les 'grains' :</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Fournissent des informations :</dt>
+<dd><ul class="first last simple">
+<li>Matériel</li>
+<li>Logiciel</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">Sont personnalisables</p>
+</li>
+<li><p class="first">Permettent de cibler les minion</p>
+</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="bien-viser-le-role-des-grains-2">
+<h1>Bien viser, le rôle des grains (2)</h1>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">salt</span> <span class="s">&#39;minion.example.com&#39;</span> <span class="n">grains</span><span class="o">.</span><span class="n">get</span> <span class="n">os</span>
+<span class="n">minion</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span>
+<span class="o">------------------</span>
+<span class="n">Fedora</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">salt</span> <span class="s">&#39;minion.example.com&#39;</span> <span class="n">grains</span><span class="o">.</span><span class="n">set</span> <span class="n">node_type</span> <span class="n">django</span>
+<span class="n">salt</span> <span class="s">&#39;minion.example.com&#39;</span> <span class="n">grains</span><span class="o">.</span><span class="n">set</span> <span class="n">role</span> <span class="n">prod</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="id1">
+<h1>Bien viser, le rôle des grains (2)</h1>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">salt</span> <span class="o">-</span><span class="n">C</span> <span class="s">&#39;G@node_type:django and G@role:prod&#39;</span> <span class="n">service</span><span class="o">.</span><span class="n">status</span> <span class="n">nginx</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">salt</span> <span class="o">-</span><span class="n">G</span> <span class="s">&quot;node_type:django&quot;</span> <span class="n">ssh</span><span class="o">.</span><span class="n">set_auth_key</span> <span class="n">john</span> \
+<span class="s">&quot;AAAAB3NzaC1yc2EAAAADAQABAAABAQDiG087JF..&quot;</span> <span class="n">enc</span><span class="o">=</span><span class="s">&quot;ssh-rsa&quot;</span> \
+<span class="n">comment</span><span class="o">=</span><span class="s">&quot;john&#39;s key&quot;</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="configuration-les-etats">
+<h1>Configuration : Les états</h1>
+<ul class="simple">
+<li>Les fichiers d'état sont des templates jinja ayant pour destination le format
+yaml</li>
+<li>Ils sont stockés par défaut dans /srv/salt</li>
+<li>Un état correspond à une exigence : &quot;Installer le paquet nginx&quot;</li>
+<li>Il peut dépendre d'autre état : &quot;Nginx doit être lancé&quot; requiert &quot;Installation
+du paquet Nginx&quot;</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="exemple-d-etat-avec-utilisation-de-grain">
+<h1>Exemple d'état avec utilisation de grain</h1>
+<div class="highlight-yaml"><div class="highlight"><pre># /srv/salt/nginx.sls
+{% if grains[&#39;node_type&#39;] == &#39;django&#39; %}
+nginx:
+    pkg.installed:
+        - nginx
+    service.runing:
+        - name: nginx
+        - require:
+          - pkg: nginx
+{% endif %}
+</pre></div>
+</div>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">salt &#39;minion.example.com&#39; state.sls nginx</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="top-sls-highstate-le-point-d-entree">
+<h1>top.sls + highstate : le point d'entrée</h1>
+<p><strong>top.sls</strong></p>
+<blockquote>
+<div>le fichier d'entrée qui associe les états aux machines</div></blockquote>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># /srv/salt/top.sls</span>
+<span class="l-Scalar-Plain">base</span><span class="p-Indicator">:</span>
+    <span class="s">&#39;minion.example.com&#39;</span><span class="p-Indicator">:</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">django_project</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">nginx</span>
+</pre></div>
+</div>
+<p>Ce qui va nous permettre de lancer</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">salt &#39;*&#39; state.highstate</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="gestion-des-dependances-require">
+<h1>Gestion des dépendances : require</h1>
+<p><strong>require</strong> permet de requérir :</p>
+<ul class="simple">
+<li>Un état</li>
+<li>Un fichier d'état</li>
+</ul>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">include</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">nginx</span>
+
+<span class="l-Scalar-Plain">collect_static</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">cmd.run</span><span class="p-Indicator">:</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/root/collect_static.sh</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">require</span><span class="p-Indicator">:</span>
+          <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sls</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">nginx</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="gestion-des-dependances-watch">
+<h1>Gestion des dépendances : watch</h1>
+<p>Observe les modifications apportées par un autre état</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">gunicorn_conf_file</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">file.managed</span><span class="p-Indicator">:</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">source</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">salt://django/source/etc/gunicorn.d/project.conf</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/etc/gunicorn.d/project.conf</span>
+
+<span class="l-Scalar-Plain">gunicorn</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">service.running</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">enable</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">True</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">reload</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">True</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">watch</span><span class="p-Indicator">:</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">file</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">gunicorn_conf_file</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="le-fileserver">
+<h1>Le fileserver</h1>
+<ul class="simple">
+<li>Un serveur de fichier en ZeroMQ intégré au service salt-master</li>
+<li>Permet de fournir des fichiers au gestionnaire d'états</li>
+<li>Les fichiers sont des templates</li>
+<li>Par défaut, les fichiers sont placés dans la même arborescence que les états</li>
+</ul>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">gunicorn_conf_file</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">file.managed</span><span class="p-Indicator">:</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">source</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">salt://django/source/etc/gunicorn.d/project.conf</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/etc/gunicorn.d/project.conf</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">template</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">jinja</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="pillar-des-variables-de-configuration">
+<h1>Pillar : des variables de configuration</h1>
+<p>Composant permettant de distribuer des variables de configuration :</p>
+<ul class="simple">
+<li>Stockées sur le master</li>
+<li>Associées aux minions par le biais des grains</li>
+<li>Cloisonnées</li>
+<li>Utilisables dans les states</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="pillar-exemple">
+<h1>Pillar : exemple</h1>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="c1">#/srv/pillar/top.sls</span>
+<span class="l-Scalar-Plain">base</span><span class="p-Indicator">:</span>
+    <span class="s">&#39;minion.example.com&#39;</span><span class="p-Indicator">:</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">db_pass</span>
+
+<span class="c1">#/srv/pillar/db_pass.sls</span>
+<span class="l-Scalar-Plain">sql_user</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">django</span>
+<span class="l-Scalar-Plain">sql_password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">ma donnéessuper secret</span>
+</pre></div>
+</div>
+<div class="highlight-jinja"><div class="highlight"><pre><span class="x"># /srv/salt/django_project/sources/etc/django/settings.py</span>
+<span class="x">DATABASES = {</span>
+<span class="x">        ...</span>
+<span class="x">        &#39;USER&#39;: &#39;</span><span class="cp">{{</span> <span class="nv">pillar</span><span class="o">[</span><span class="s1">&#39;sql_user&#39;</span><span class="o">]</span> <span class="cp">}}</span><span class="x">&#39;,</span>
+<span class="x">        &#39;PASSWORD&#39;: &#39;</span><span class="cp">{{</span> <span class="nv">pillar</span><span class="o">[</span><span class="s1">&#39;sql_password&#39;</span><span class="o">]</span> <span class="cp">}}</span><span class="x">&#39;,</span>
+</pre></div>
+</div>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="mutualisation-des-states">
+<h1>Mutualisation des states</h1>
+<p>Par défaut les fichiers d'état sont placés dans le répertoire /srv/salt, mais il
+est possible :</p>
+<ul class="simple">
+<li>D'utiliser des répertoires distants (ex : git)</li>
+<li>D'utiliser plusieurs sources</li>
+</ul>
+<p>Ce qui permet d'avoir des dépôts de states génériques.</p>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="salt-formulas">
+<h1>Salt-formulas</h1>
+<p>Des repository git génériques alimentés par la communauté.</p>
+<p>Dans /etc/salt/master</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fileserver_backend</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">roots</span>
+    <span class="o">-</span> <span class="n">git</span>
+
+<span class="n">gitfs_remotes</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">saltstack</span><span class="o">-</span><span class="n">formulas</span><span class="o">/</span><span class="n">nginx</span><span class="o">-</span><span class="n">formula</span>
+  <span class="o">-</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">saltstack</span><span class="o">-</span><span class="n">formulas</span><span class="o">/</span><span class="n">memcached</span><span class="o">-</span><span class="n">formula</span>
+</pre></div>
+</div>
+<p>En configurant nos données pillar, on dispose de states avancés pour installer
+memcached et nginx.</p>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="la-suite-1">
+<h1>La suite (1)</h1>
+<p><strong>outputers</strong></p>
+<blockquote>
+<div>Le format des données renvoyées par les states</div></blockquote>
+<p><strong>returners</strong></p>
+<blockquote>
+<div>La destination des données renvoyées (base de données, mail, irc ...)</div></blockquote>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="l-orchestration-reactor-et-mine">
+<h1>L'orchestration : reactor et mine</h1>
+<p><strong>salt-mine</strong></p>
+<blockquote>
+<div>permet d'autoriser les minions à communiquer entre eux</div></blockquote>
+<p><strong>salt-reactor</strong></p>
+<blockquote>
+<div>permet, sur la base des events renvoyés, de spécifier des
+callbacks (ex : ajouter une machine au serveur de monitoring lorsqu'un nouveau
+serveur a été initialisé).</div></blockquote>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="cloud-salt-cloud-et-salt-virt">
+<h1>Cloud : salt-cloud et salt-virt</h1>
+<p><strong>salt-cloud</strong></p>
+<blockquote>
+<div>propose une interface pour les différentes solutions de cloud IAAS (Aws, rackspace,
+openstack ...)</div></blockquote>
+<p><strong>salt-virt</strong></p>
+<blockquote>
+<div>permet de manipuler de manière unifier et transparente un ensemble
+d'hyperviseur kvm</div></blockquote>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="retour-1">
+<h1>Retour (1)</h1>
+<ul class="simple">
+<li>Nette simplification permettant une orientation vers les problématiques
+métiers.</li>
+<li>Des fonctionnalités qui nous ont permis de développer des outils pertinents.</li>
+</ul>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="retour-2">
+<h1>Retour (2)</h1>
+<ul class="simple">
+<li>Des régressions et des problèmes pénibles (gestion des mises à jour, state qui
+ne fonctionnent plus)</li>
+<li>Une base de code et un cycle d'intégration des patchs upstream &quot;légers&quot;</li>
+</ul>
+<p>À noter : une nette progression appréciable</p>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="questions">
+<h1>Questions</h1>
+<p>Le lien vers la conf</p>
+<blockquote>
+<div><a class="reference external" href="https://github.com/tonthon/salt-slides">https://github.com/tonthon/salt-slides</a></div></blockquote>
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+<article class="slide level-1" id="merci">
+<h1>Merci</h1>
+<img alt="_images/logos.png" class="align-center" src="_images/logos.png" />
+
+<div class="slide-footer">tech@majerti.fr</div>
+
+</article>
+
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>
