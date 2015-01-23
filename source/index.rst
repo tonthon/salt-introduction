@@ -3,145 +3,183 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Salt
-----
+Saltstack
+=========
 
 .. image:: _static/salt.png
     :align: center
 
+Gaston TJEBBES
 
-Gérer son infra avec Salt
--------------------------
+tech@majerti.fr
 
-* Introduction
-* Bootstrapper un projet
-* Cibler à l'aide de grains
-* Ordonner des états
-* Servir des fichiers
+Le contexte
+===========
 
-Que faire avec Salt ?
----------------------
+* L'hébergement de solutions développées en interne
+* Le réseau interne d'une entreprise
 
-* Gérer la configuration de l'ensemble de son infrastructure de manière unifiée
-* Éxécuter des commandes à distance sur des ensembles de serveurs
+Le besoin
+==========
+
+* Gain de temps
+* Gestion des problématiques de sécurité
+* Automatisation du workflow
+* Uniformiser les configurations
+* Anticiper la croissance
+
+Autrement dit
+=============
+
+* Lancer des commandes de manière unifiée
+* Centraliser des configurations éparses
+* Gérer des dépendances (logiciels, fonctionnels)
+* Cibler des machines
+
+Pourquoi Saltstack
+==================
+
+* Libre
+* Python
+* Une architecture simple
+* Un système de ciblage avancé (grains + pillar)
+* Des fonctionnalités qui matchent nos besoins et nos ambitions
+  (salt-virt, reactor, salt-mine ...)
 
 Le projet
----------
+=========
 
 * Projet initié en 2011 par Thomas S Hatch
-* En 2012 Salt est le 8ème projet avec le plus de contributeur unique sur github
+* Licence Apache 2.0
 * Une ML très active
-* Actuellement en version 0.14
+* Près d'un millier de contributeurs
+* Porté par une entreprise du même nom
 
-Composants
-----------
+Les composants
+==============
 
-* ZeroMQ
-* msgpack : minimalisation du trafic
-* Authentification par clés RSA
-* Cryptage par AES
-* Templating (jinja par défaut)
+* Protocole : ZeroMQ ou RAET
+* Format : MsgPack + AES
+* Authentification : clés RSA
 
-Les forces de salt
-------------------
+Disponibilité
+==============
 
-* La simplicité architecturale
-* La simplicité de sa syntaxe
-* La granularité
-* L'imbrication d'états
-* Les performances
-* C'est du Python :)
+* BSD
+* Linux
+* Windows
+* Osx
+* ...
 
-Une architecture simple
------------------------
+Architecture
+=============
 
-De base, 1 seul étage
-    * Le service salt-master donne des ordres
-    * Les services salt-minion les éxécutent
+Trois niveaux de complexité:
+
+* Appel local par le biais de salt-call
+* Un master et des minions
+* salt-syndic, l'architecture à plusieurs étages
+
+Un master des minions
+======================
 
 .. image:: _static/1floor.svg
 
-Une architecture évolutive
---------------------------
-
-Salt-syndic permet de rajouter des étages
+Salt-syndic
+===========
 
 .. image:: _static/saltsyndic.svg
 
-Mise en place du master
------------------------
+Commencer
+=========
 
-.. code-block:: bash
+Installer un "master"
 
-    wget https://github.com/saltstack/salt-bootstrap/develop/bootstrap-salt.sh
-    chmod +x bootstrap-salt.sh
-    ./bootstrap-salt.sh -M
+.. code-block:: console
 
-Mise en place du minion
------------------------
+    yum install salt-master
 
-.. code-block:: bash
+Installer des "minion"
 
-    wget https://github.com/saltstack/salt-bootstrap/develop/bootstrap-salt.sh
-    chmod +x bootstrap-salt.sh
-    ./bootstrap-salt.sh
-    echo "<ip du master> salt" > /etc/hosts
+.. code-block:: console
 
-* Enregistrement du minion sur le master
+    yum install salt-minion
 
-.. code-block:: bash
+Référencer
 
-    salt-key -A # Ajoute toutes les clés en attente
+.. code-block:: console
+
+    salt-key -a minion.example.com
 
 On peut désormais jouer
------------------------
+=======================
 
-Les states.modules fournissent un panel de commandes éxécutables
+Les **modules** fournissent un panel de commandes exécutables
 
 .. code-block:: bash
 
     salt '*' test.ping
-    salt '*' pkg.list_upgrades
-    mon-server-minion:
-            ----------
-            base-files:
-                6.0squeeze7
-            dbus:
-                1.2.24-4+squeeze2
-            ...
+    salt 'minion.example.com' pkg.upgrade
 
-Bien viser, le rôle des grains
-------------------------------
+Modules
+========
 
-* Les minions fournissent par défaut des variables d'environnement les 'grains'
+* De nombreuses librairies (mount, pkg, rabbitmq, ...)
+* Des modules "méta" ( ex: pkg )
+* Développables facilement
 
 .. code-block:: python
 
-    salt '*' grains.items
-    biosreleasedate: 01/01/2007
-    biosversion: Bochs
-    cpu_flags: fpu de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pse36
-    clflush mmx fxsr sse sse2 syscall nx lm up rep_good pni cx16 popcnt
-    hypervisor lahf_lm
-    cpu_model: QEMU Virtual CPU version 1.1.2
-    cpuarch: x86_64
-    defaultencoding: None
-    ...
+    #/srv/salt/_modules/hello.py
+    def message(filepath, message):
+        with open(filepath, w) as file_buffer:
+            file_buffer.write(message)
 
-Rajouter des grains
--------------------
+.. code-block:: console
 
-* Des grains personnalisés peuvent être:
+    salt 'minion.example.com' hello.message /tmp/test "Hello world"
 
-  * Ajoutés depuis le fichier de config du minion
-  * Envoyés depuis le master vers les minions par le biais de fichiers
-  * Définis en ligne de commande depuis le master `salt 'target' grains.setval
-    key val`
+Bien viser, le rôle des grains (1)
+===================================
 
-* Voir aussi : Pillar (des grains dynamiques et confidentiels)
+Les minions fournissent par défaut des variables d'environnement les 'grains' :
 
-Les états
----------
+* Fournissent des informations :
+    * Matériel
+    * Logiciel
+* Sont personnalisables
+* Permettent de cibler les minion
+
+Bien viser, le rôle des grains (2)
+===================================
+
+.. code-block:: python
+
+    salt 'minion.example.com' grains.get os
+    minion.example.com
+    ------------------
+    Fedora
+
+.. code-block:: python
+
+    salt 'minion.example.com' grains.set node_type django
+    salt 'minion.example.com' grains.set role prod
+
+Bien viser, le rôle des grains (2)
+===================================
+
+.. code-block:: python
+
+    salt -C 'G@node_type:django and G@role:prod' service.status nginx
+
+.. code-block:: python
+
+    salt -G "node_type:django" ssh.set_auth_key john \
+    "AAAAB3NzaC1yc2EAAAADAQABAAABAQDiG087JF.." enc="ssh-rsa" \
+    comment="john's key"
+
+Configuration : Les états
+===========================
 
 * Les fichiers d'état sont des templates jinja ayant pour destination le format
   yaml
@@ -151,11 +189,12 @@ Les états
   du paquet Nginx"
 
 Exemple d'état avec utilisation de grain
-----------------------------------------
+============================================
 
 .. code-block:: yaml
 
-    {% if grains['hosts'] == 'monserveurweb.org' %}
+    # /srv/salt/nginx.sls
+    {% if grains['node_type'] == 'django' %}
     nginx:
         pkg.installed:
             - nginx
@@ -165,8 +204,71 @@ Exemple d'état avec utilisation de grain
               - pkg: nginx
     {% endif %}
 
+.. code-block:: yaml
+
+    salt 'minion.example.com' state.sls nginx
+
+top.sls + highstate : le point d'entrée
+========================================
+
+**top.sls**
+
+    le fichier d'entrée qui associe les états aux machines
+
+.. code-block:: yaml
+
+    # /srv/salt/top.sls
+    base:
+        'minion.example.com':
+            - django_project
+            - nginx
+
+Ce qui va nous permettre de lancer
+
+.. code-block:: console
+
+    salt '*' state.highstate
+
+Gestion des dépendances : require
+==================================
+
+**require** permet de requérir :
+
+* Un état
+* Un fichier d'état
+
+.. code-block:: yaml
+
+    include:
+        - nginx
+
+    collect_static:
+        cmd.run:
+            - name: /root/collect_static.sh
+            - require:
+              - sls: nginx
+
+Gestion des dépendances : watch
+================================
+
+Observe les modifications apportées par un autre état
+
+.. code-block:: yaml
+
+    gunicorn_conf_file:
+        file.managed:
+            - source: salt://django/source/etc/gunicorn.d/project.conf
+            - name: /etc/gunicorn.d/project.conf
+
+    gunicorn:
+      service.running:
+        - enable: True
+        - reload: True
+        - watch:
+          - file: gunicorn_conf_file
+
 Le fileserver
--------------
+===============
 
 * Un serveur de fichier en ZeroMQ intégré au service salt-master
 * Permet de fournir des fichiers au gestionnaire d'états
@@ -175,23 +277,137 @@ Le fileserver
 
 .. code-block:: yaml
 
-    mysql_conf:
+    gunicorn_conf_file:
         file.managed:
-            - name: /etc/mysql/my.cnf
-            - source: salt://etc/mysql/my.cnf
-            - require:
-              - pkg: mysql
+            - source: salt://django/source/etc/gunicorn.d/project.conf
+            - name: /etc/gunicorn.d/project.conf
+            - template: jinja
 
-Ce qu'on voudra voir par la suite
----------------------------------
+Pillar : des variables de configuration
+========================================
 
-* Écrire ses propres modules
-* Écrire ses propres états
-* Pillar : grains confidentiels et dynamiques
-* Salt-cloud : s'interfacer avec des environnements Cloud (Amazon AWS, RackSpace
-  ...)
+Composant permettant de distribuer des variables de configuration :
+
+* Stockées sur le master
+* Associées aux minions par le biais des grains
+* Cloisonnées
+* Utilisables dans les states
+
+Pillar : exemple
+=================
+
+.. code-block:: yaml
+
+    #/srv/pillar/top.sls
+    base:
+        'minion.example.com':
+            - db_pass
+
+    #/srv/pillar/db_pass.sls
+    sql_user: django
+    sql_password: ma donnéessuper secret
+
+.. code-block:: jinja
+
+    # /srv/salt/django_project/sources/etc/django/settings.py
+    DATABASES = {
+            ...
+            'USER': '{{ pillar['sql_user'] }}',
+            'PASSWORD': '{{ pillar['sql_password'] }}',
+
+Mutualisation des states
+====================================
+
+Par défaut les fichiers d'état sont placés dans le répertoire /srv/salt, mais il
+est possible :
+
+* D'utiliser des répertoires distants (ex : git)
+* D'utiliser plusieurs sources
+
+Ce qui permet d'avoir des dépôts de states génériques.
+
+Salt-formulas
+==============
+
+Des repository git génériques alimentés par la communauté.
+
+Dans /etc/salt/master
+
+.. code-block:: python
+
+    fileserver_backend:
+        - roots
+        - git
+
+    gitfs_remotes:
+      - https://github.com/saltstack-formulas/nginx-formula
+      - https://github.com/saltstack-formulas/memcached-formula
+
+En configurant nos données pillar, on dispose de states avancés pour installer
+memcached et nginx.
+
+La suite (1)
+============
+
+**outputers**
+
+    Le format des données renvoyées par les states
+
+**returners**
+
+    La destination des données renvoyées (base de données, mail, irc ...)
+
+L'orchestration : reactor et mine
+==================================
+
+**salt-mine**
+
+    permet d'autoriser les minions à communiquer entre eux
+
+**salt-reactor**
+
+    permet, sur la base des events renvoyés, de spécifier des
+    callbacks (ex : ajouter une machine au serveur de monitoring lorsqu'un nouveau
+    serveur a été initialisé).
+
+Cloud : salt-cloud et salt-virt
+================================
+
+**salt-cloud**
+
+    propose une interface pour les différentes solutions de cloud IAAS (Aws, rackspace,
+    openstack ...)
+
+**salt-virt**
+
+    permet de manipuler de manière unifier et transparente un ensemble
+    d'hyperviseur kvm
+
+Retour (1)
+==============
+
+* Nette simplification permettant une orientation vers les problématiques
+  métiers.
+* Des fonctionnalités qui nous ont permis de développer des outils pertinents.
+
+Retour (2)
+============
+
+* Des régressions et des problèmes pénibles (gestion des mises à jour, state qui
+  ne fonctionnent plus)
+* Une base de code et un cycle d'intégration des patchs upstream "légers"
+
+À noter : une nette progression appréciable
+
+Questions
+=========
+
+Le lien vers la conf
+
+    https://github.com/majerteam/salt-slides
 
 Merci
------
+======
 
-Des questions ?
+.. image:: _static/logos.png
+    :align: center

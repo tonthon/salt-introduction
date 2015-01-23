@@ -242,6 +242,8 @@ texinfo_documents = [
 #texinfo_show_urls = 'footnote'
 slide_theme_options = {'custom_css':'custom.css'}
 
+slide_footer = "tech@majerti.fr"
+
 
 # -- Options for PDF output --------------------------------------------------
 
@@ -296,7 +298,7 @@ pdf_style_path = ['.', '_styles']
 # Section level that forces a break page.
 # For example: 1 means top-level sections start in a new page
 # 0 means disabled
-#pdf_break_level = 0
+pdf_break_level = 1
 
 
 # When a section starts in a new page, force it to be 'even', 'odd',
@@ -314,7 +316,7 @@ pdf_style_path = ['.', '_styles']
 
 
 # If false, no index is generated.
-#pdf_use_index = True
+pdf_use_index = True
 
 
 # If false, no modindex is generated.
